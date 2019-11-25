@@ -1,12 +1,13 @@
 # filestat
 
 a library that has basically two func
-#func AddFile(metadata FileMetadata) error
+
+# func AddFile(metadata FileMetadata) error
 
 The function receives a structure containing the metadata of one file. This file should be taken into account
 when calculating statistics. The function can return an error if the input is invalid or processing of the file fails.
 
-#func GetStats() FileStats
+# func GetStats() FileStats
 
 This function returns statistics for all files added until that point. The following statistics should be returned:
 Number of files received
