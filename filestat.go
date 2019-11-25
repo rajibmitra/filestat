@@ -1,6 +1,8 @@
-package filestat
+package main
 
 import (
+	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -96,4 +98,26 @@ func (f *Files) GetStats() FileStats {
 		// MostRecentPaths: f.getMostRecentPath(),
 	}
 	return filestats
+}
+
+func main() {
+	//example
+	// f := Files{Files: []FileMetadata{}}
+	// f.AddFile("/tmp/tt.sh", "/tmp/aa.sh", "/tmp/bb.txt", "/tmp/cc.png", "/tmp/dd.png", "/tmp/ee.png", "/tmp/ff.jpeg")
+	// fmt.Printf("%#v\n", f.GetStats())
+
+	textPtr := flag.String("Addfile", "", "Files to add, (Required)")
+
+	flag.Parse()
+
+	if *textPtr == "" {
+		flag.PrintDefaults()
+		os.Exit(1) 
+	}else  *textPtr != nil  {
+		f := Files{Files: []FileMetadata{}}
+		f.AddFile(*textPtr)
+	}
+}
+
+	fmt.Printf("textPtr: %s \n", *textPtr)
 }
