@@ -1,12 +1,15 @@
 package main
 
 import (
-	"flag"
+	// "flag"
 	"os"
 	"path/filepath"
 	"fmt"
+	"log"
+	"github.com/urfave/cli"
 )
 
+var app = cli.NewApp()
 // Files represents a list of files with their metadata
 type Files struct {
 	Files []FileMetadata `json:"files"`
@@ -100,26 +103,44 @@ func (f *Files) GetStats() FileStats {
 	return filestats
 }
 
-func main() {
-	
-	//example
-	// f := Files{Files: []FileMetadata{}}
-	// f.AddFile("/tmp/tt.sh", "/tmp/aa.sh", "/tmp/bb.txt", "/tmp/cc.png", "/tmp/dd.png", "/tmp/ee.png", "/tmp/ff.jpeg")
-	// fmt.Printf("%#v\n", f.GetStats())
+func info() {
+	app.Name = "file stat utility"
+	app.Author = "rajibmitra"
+	app.Usage = "An example CLI for checking the stats of your files"
+	app.Version = "0.0.1"
+  }
 
-	textPtr := flag.String("Addfile", "", "Files to add, (Required)")
-
-	flag.Parse()
-
-	if *textPtr == "" {
-		flag.PrintDefaults()
-		os.Exit(1)
-	} else if textPtr != nil {
-		f := Files{Files: []FileMetadata{}}
-		f.AddFile(*textPtr)
-		fmt.Printf("%#v\n", f.GetStats())
+func commands() {
+	app.Commands = []cli.Command{
+	  {
+		Name:    "addfile",
+		Aliases: []string{"file"},
+		Usage:   "see your file stats",
+		Action: func(c *cli.Context) { 
+		},
+	  },
+	 
 	}
-// fmt.Printf("textPtr: %s \n", *textPtr)
-}
+  }
 
-// fmt.Printf("textPtr: %s \n", *textPtr)
+
+
+
+func main() {
+
+
+	info()
+	commands()
+	err := app.Run(os.Args)
+	
+	file := os.Args[len(os.Args)-1]
+	f := Files{Files: []FileMetadata{}}
+
+	f.AddFile(file)
+	fmt.Printf("%#v\n", f.GetStats())
+	fmt.Println(file)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
