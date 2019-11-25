@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"path/filepath"
+	"fmt"
 )
 
 // Files represents a list of files with their metadata
@@ -101,6 +101,7 @@ func (f *Files) GetStats() FileStats {
 }
 
 func main() {
+	
 	//example
 	// f := Files{Files: []FileMetadata{}}
 	// f.AddFile("/tmp/tt.sh", "/tmp/aa.sh", "/tmp/bb.txt", "/tmp/cc.png", "/tmp/dd.png", "/tmp/ee.png", "/tmp/ff.jpeg")
@@ -112,12 +113,13 @@ func main() {
 
 	if *textPtr == "" {
 		flag.PrintDefaults()
-		os.Exit(1) 
-	}else  *textPtr != nil  {
+		os.Exit(1)
+	} else if textPtr != nil {
 		f := Files{Files: []FileMetadata{}}
 		f.AddFile(*textPtr)
+		fmt.Printf("%#v\n", f.GetStats())
 	}
+// fmt.Printf("textPtr: %s \n", *textPtr)
 }
 
-	fmt.Printf("textPtr: %s \n", *textPtr)
-}
+// fmt.Printf("textPtr: %s \n", *textPtr)
