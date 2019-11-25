@@ -1,140 +1,99 @@
-package main
+package filestat
 
 import (
 	"os"
 	"path/filepath"
 )
 
-// Files : type which is part of Filemetadata
+// Files represents a list of files with their metadata
 type Files struct {
-	files []FileMetadata `json:"files"`
+	Files []FileMetadata `json:"files"`
 }
 
-// ExtInfo : extension info
+// ExtInfo represents informations about an extension
 type ExtInfo struct {
 	Extension      string `json:"extension"`
 	NumOccurrences int64  `json:"num_occurrences"`
 }
 
-const (
-	maxInt = int(^uint(0) >> 1)
-	minInt = -maxInt - 1
-)
-
-// util func that will return the max number from a map
-func max(numbers map[int]bool) int {
-	var maxNumber int
-	for maxNumber = range numbers {
-		break
-	}
-	for n := range numbers {
-		if n > maxNumber {
-			maxNumber = n
-		}
-	}
-	return maxNumber
-}
-
-// FileMetadata : holds the files metadata
+// FileMetadata represent a file with its metadata
 type FileMetadata struct {
 	Path     string `json:"path"`      // the file's absolute path
 	Size     int64  `json:"size"`      //the file size
 	IsBinary bool   `json:"is_binary"` // whether the file is a binary file or a simple text file
 }
 
-// FileStats is File's file stats/metadatas
+// FileStats represents statistics about files
 type FileStats struct {
-	Numfiles        int64           `json:"num_files"`
-	LargestFile     LargestFileInfo `json:"largest_file"`
-	AverageFileSize float64         `json:"avg_file_size"`
-	MostFrequentExt ExtInfo         `json:"most_frequent_ext"`
-	TextPercentage  float32         `json:"text_percentage"`
-	MostRecentPaths []string        `json:"most_recent_paths"`
+	Numfiles        int64        `json:"num_files"`
+	LargestFile     FileMetadata `json:"largest_file"`
+	AverageFileSize float64      `json:"avg_file_size"`
+	MostFrequentExt ExtInfo      `json:"most_frequent_ext"`
+	TextPercentage  float32      `json:"text_percentage"`
+	MostRecentPaths []string     `json:"most_recent_paths"`
 }
 
-// LargestFileInfo : struct of largest file info
-type LargestFileInfo struct {
-	Path string `json:"path"`
-	Size int64  `json:"size"`
-}
-
-// AddFile : adds a fle based on metadata
-func (files *Files) AddFile(filename string) error {
-	/*
-		The function receives a structure containing the metadata of one file.
-		This file should be taken into account when calculating statistics.
-		The function can return an error if the input is invalid or processing of the file fails.
-		Need to throw error here if input is invalid or processing of the file fails
-	*/
-
-	abspath, err := filepath.Abs(filename)
-	if err != nil {
-		return err
+// AddFile adds a file in a Files list
+func (f *Files) AddFile(filename ...string) error {
+	for _, i := range filename {
+		abspath, err := filepath.Abs(i)
+		if err != nil {
+			return err
+		}
+		stat, err := os.Stat(abspath)
+		if err != nil {
+			return err
+		}
+		f.Files = append(f.Files, FileMetadata{Path: abspath, Size: stat.Size()})
 	}
-	stat, err := os.Stat(abspath)
-	if err != nil {
-		return err
-	}
-	files = append(files, FileMetadata{Path: abspath, Size: state.Size()})
+	return nil
 }
 
-// this function returns the largest file received including name and size
-func (files *Files) getLargestFile() string {
+// getLargestFile retrieves largest file in list
+func (f *Files) getLargestFile() FileMetadata {
 	l := FileMetadata{Path: "", Size: 0}
-	for _, i := range files {
+	for _, i := range f.Files {
 		if i.Size > l.Size {
-			latest = i
+			l = i
 		}
 	}
 	return l
 }
 
-// this function returns the average file size which is (total_size / num_of_files)
-func (file *Files) getAverageFile() int64 {
+// getAverageFile retrieves average size of files in list
+func (f *Files) getAverageFile() float64 {
 	var sum int64
-	for _, i := range file {
+	for _, i := range f.Files {
 		sum += i.Size
 	}
-	return sum / len(file)
+	return float64(sum) / float64(len(f.Files))
 }
 
-func (file *Files) MostFrequentExt() GetExtInfo {
+// MostFrequentExt returns most frequent extension
+func (f *Files) MostFrequentExt() ExtInfo {
 	m := make(map[string]int64)
-	for _, i := range file {
-		m[filepath.Ext(i.Path)] += 1
+	for _, i := range f.Files {
+		m[filepath.Ext(i.Path)]++
 	}
-	// p :=
-	// for i, j := range m {
-	// 	if i > j
-	// }
-	// need to make it simple :rajibmitra
-	return max(m)
+	p := ExtInfo{}
+	for i, j := range m {
+		if j > p.NumOccurrences {
+			p.Extension = i
+			p.NumOccurrences = j
+		}
+	}
+	return p
 }
 
-// GetStats return File's stats
-func (files *Files) GetStats() FileStats {
-
-	/*
-		This function returns statistics for all files added until that point. The following statistics should be returned:
-		Number of files received
-		Largest file received (including name and size)
-		Average file size
-		Most frequent file extension (including number of occurences)
-		Percentage of text files of all files received
-		List of latest 10 file paths received
-	*/
-
+// GetStats returns statistics about files in list
+func (f *Files) GetStats() FileStats {
 	filestats := FileStats{
-		Num:                len(files),
-		GetLargestFileInfo: getLargestFile(files),
-		AverageFileSize:    getAverageFile(files),
-		MostFreqExt:        MostFrequentExt(files),
-		TextPercentage:     getTextPercentage(files),
-		MostRecentPaths:    getMostRecentPath(files),
-
-		//rajibmitra: need to implement https://stackoverflow.com/questions/17133590/how-to-get-file-length-in-go
-
+		Numfiles:        int64(len(f.Files)),
+		LargestFile:     f.getLargestFile(),
+		AverageFileSize: f.getAverageFile(),
+		MostFrequentExt: f.MostFrequentExt(),
+		// TextPercentage:  f.getTextPercentage(),
+		// MostRecentPaths: f.getMostRecentPath(),
 	}
-	return &filestats, nil
-
+	return filestats
 }
