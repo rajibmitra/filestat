@@ -105,7 +105,7 @@ func (f *Files) GetStats() FileStats {
 
 func info() {
 	app.Name = "file stat utility"
-	app.Author = "rajibmitra"
+	app.Author = "rajibmitra,Issif"
 	app.Usage = "An example CLI for checking the stats of your files"
 	app.Version = "0.0.1"
   }
