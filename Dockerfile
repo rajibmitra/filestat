@@ -13,7 +13,7 @@ RUN go build -o filestat
 
 # Final Docker image
 FROM alpine:3.10 AS final-stage
-LABEL MAINTAINER "Rajib Mitra <rajib.jolite@gmail.com."
+LABEL MAINTAINER "fiorm <fiorm.github@gmail.com."
 
 RUN apk add --no-cache ca-certificates
 
